@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, PlugZap, Save } from "lucide-react";
+import { Loader2, PlugZap, Save, MailCheck } from "lucide-react";
 import { Toggle } from "@/components/admin/ui";
 
 export default function SettingsClient({ initial }: { initial: Record<string, string> }) {
@@ -23,7 +23,31 @@ export default function SettingsClient({ initial }: { initial: Record<string, st
   });
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [testingEmail, setTestingEmail] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  async function testEmail() {
+    setTestingEmail(true);
+    setMessage(null);
+    // Simpan dulu supaya kredensial terbaru yang diuji
+    await fetch("/api/admin/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    const res = await fetch("/api/admin/email/test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const data = await res.json();
+    setTestingEmail(false);
+    setMessage(
+      res.ok
+        ? { type: "ok", text: data.message }
+        : { type: "err", text: data.error ?? "Gagal mengirim email tes." }
+    );
+  }
 
   function set(key: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -261,8 +285,18 @@ export default function SettingsClient({ initial }: { initial: Record<string, st
             >
               myaccount.google.com/apppasswords
             </a>{" "}
-            (akun Gmail harus mengaktifkan verifikasi 2 langkah dulu).
+            (akun Gmail harus mengaktifkan verifikasi 2 langkah dulu).{" "}
+            <b className="text-ink">Penting:</b> Alamat Gmail Pengirim harus akun Google yang{" "}
+            <b className="text-ink">sama</b> dengan yang membuat App Password.
           </p>
+          <button onClick={testEmail} disabled={testingEmail} className="btn-ghost">
+            {testingEmail ? (
+              <Loader2 size={15} className="animate-spin" aria-hidden />
+            ) : (
+              <MailCheck size={15} aria-hidden />
+            )}
+            Tes Kirim Email
+          </button>
         </div>
       </section>
 

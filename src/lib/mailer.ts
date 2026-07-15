@@ -26,7 +26,7 @@ function isEmail(text: string) {
 export async function sendInvoiceEmail(order: OrderForEmail, kind: "created" | "success") {
   const s = await getSettings();
   const user = s.smtpUser?.trim();
-  const pass = s.smtpPass?.trim();
+  const pass = s.smtpPass?.replace(/\s+/g, "");
   if (s.emailEnabled !== "1" || !user || !pass) return { sent: false, reason: "Email belum dikonfigurasi" };
   if (!isEmail(order.contact)) return { sent: false, reason: "Kontak pelanggan bukan email" };
 
@@ -86,7 +86,7 @@ export async function sendInvoiceEmail(order: OrderForEmail, kind: "created" | "
 export async function sendPasswordResetEmail(to: string, name: string, resetLink: string) {
   const s = await getSettings();
   const user = s.smtpUser?.trim();
-  const pass = s.smtpPass?.trim();
+  const pass = s.smtpPass?.replace(/\s+/g, "");
   if (s.emailEnabled !== "1" || !user || !pass) {
     return { sent: false, reason: "Email belum dikonfigurasi" };
   }
@@ -128,4 +128,32 @@ export async function sendPasswordResetEmail(to: string, name: string, resetLink
     html,
   });
   return { sent: true };
+}
+
+/** Kirim email percobaan dan kembalikan error SMTP asli bila gagal (untuk diagnosis di dashboard). */
+export async function sendTestEmail(to: string) {
+  const s = await getSettings();
+  const user = s.smtpUser?.trim();
+  const pass = s.smtpPass?.replace(/\s+/g, "");
+  if (!user || !pass) return { sent: false, error: "Username atau App Password belum diisi." };
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: { user, pass },
+  });
+
+  try {
+    await transporter.verify();
+    await transporter.sendMail({
+      from: `"BFSTORE" <${user}>`,
+      to: to.trim(),
+      subject: "Tes Email BFSTORE ✔",
+      html: `<div style="font-family:Arial,sans-serif;padding:24px"><h2 style="font-style:italic">BF<span style="color:#16a34a">STORE</span></h2><p>Selamat! Konfigurasi email kamu sudah benar. Invoice dan reset kata sandi akan terkirim otomatis dari alamat ini.</p></div>`,
+    });
+    return { sent: true };
+  } catch (e) {
+    return { sent: false, error: e instanceof Error ? e.message : String(e) };
+  }
 }
