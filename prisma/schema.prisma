@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("CUSTOMER") // ADMIN | CUSTOMER
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Game {
+  id           Int       @id @default(autoincrement())
+  name         String
+  slug         String    @unique
+  publisher    String    @default("")
+  category     String    @default("Games")
+  image        String    @default("")
+  description  String    @default("")
+  digiBrand    String    @default("") // brand name di price list Digiflazz, mis. "MOBILE LEGENDS"
+  fieldLabel   String    @default("User ID")
+  fieldLabel2  String    @default("") // mis. "Zone ID"; kosong = tidak dipakai
+  instructions String    @default("")
+  isActive     Boolean   @default(true)
+  isPopular    Boolean   @default(false)
+  sortOrder    Int       @default(0)
+  products     Product[]
+  orders       Order[]
+  createdAt    DateTime  @default(now())
+}
+
+model Product {
+  id        Int        @id @default(autoincrement())
+  gameId    Int
+  game      Game       @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  name      String
+  sku       String     @default("") // buyer_sku_code Digiflazz
+  basePrice Int        @default(0)  // harga modal dari Digiflazz
+  price     Int // harga jual
+  isActive  Boolean    @default(true)
+  sortOrder Int        @default(0)
+  orders    Order[]
+  flashSale FlashSale?
+}
+
+model FlashSale {
+  id         Int      @id @default(autoincrement())
+  productId  Int      @unique
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  flashPrice Int
+  startsAt   DateTime
+  endsAt     DateTime
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model Banner {
+  id        Int     @id @default(autoincrement())
+  title     String
+  subtitle  String  @default("")
+  image     String
+  link      String  @default("")
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+model PromoCode {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  type        String    @default("PERCENT") // PERCENT | FIXED
+  value       Int
+  maxDiscount Int       @default(0) // 0 = tanpa batas (untuk PERCENT)
+  minPurchase Int       @default(0)
+  usageLimit  Int       @default(0) // 0 = tanpa batas
+  usedCount   Int       @default(0)
+  expiresAt   DateTime?
+  isActive    Boolean   @default(true)
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  invoice     String   @unique
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id])
+  gameId      Int?
+  game        Game?    @relation(fields: [gameId], references: [id])
+  productId   Int?
+  product     Product? @relation(fields: [productId], references: [id])
+  gameName    String
+  productName String
+  customerNo  String // ID game pelanggan (User ID / Zone)
+  contact     String   @default("") // WhatsApp / email pelanggan
+  amount      Int
+  discount    Int      @default(0)
+  total       Int
+  promoCode   String   @default("")
+  status      String   @default("PENDING") // PENDING | PAID | PROCESSING | SUCCESS | FAILED
+  snapToken   String   @default("") // token Snap Midtrans
+  digiRef     String   @default("")
+  digiStatus  String   @default("")
+  note        String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Setting {
+  key   String @id
+  value String
+}
