@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ShieldCheck, Zap, HeadphonesIcon } from "lucide-react";
 import Logo from "./Logo";
+import { getSettings } from "@/lib/settings";
 
 function InstagramIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
   return (
@@ -23,7 +24,9 @@ function InstagramIcon({ size = 16, className = "" }: { size?: number; className
   );
 }
 
-export default function Footer() {
+export default async function Footer() {
+  const settings = await getSettings();
+  const wa = settings.whatsapp?.trim() || "";
   return (
     <footer className="mt-24 border-t border-line/60 bg-surface/50">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-4">
@@ -72,14 +75,24 @@ export default function Footer() {
           <h3 className="text-sm font-semibold">Bantuan</h3>
           <ul className="mt-4 space-y-2.5 text-sm text-muted">
             <li>
+              Email:{" "}
               <a href="mailto:cs@bfstore.id" className="transition hover:text-brand-soft">
                 cs@bfstore.id
-              </a>{" "}
-              <span className="text-xs">(kanal utama)</span>
+              </a>
             </li>
-            <li>
-              WhatsApp <span className="text-xs">(khusus kendala mendesak)</span>
-            </li>
+            {wa && (
+              <li>
+                WhatsApp:{" "}
+                <a
+                  href={`https://wa.me/${wa}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-brand-soft"
+                >
+                  +{wa}
+                </a>
+              </li>
+            )}
             <li>Jam operasional: 24 jam</li>
           </ul>
         </div>

@@ -3,8 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, RefreshCw, Loader2, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, RefreshCw, Loader2, Package, Zap, Search } from "lucide-react";
 import { Modal, ImageInput, Toggle } from "@/components/admin/ui";
+
+function titleCase(text: string) {
+  return text
+    .toLowerCase()
+    .split(" ")
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+}
 
 type Game = {
   id: number;
@@ -42,6 +50,68 @@ export default function GamesClient({ games }: { games: Game[] }) {
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  // Modal "Tambah dari Digiflazz"
+  const [digiOpen, setDigiOpen] = useState(false);
+  const [brands, setBrands] = useState<string[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(false);
+  const [brandsError, setBrandsError] = useState("");
+  const [brandQuery, setBrandQuery] = useState("");
+  const [creatingBrand, setCreatingBrand] = useState<string | null>(null);
+
+  async function openDigiModal() {
+    setDigiOpen(true);
+    setBrandQuery("");
+    setBrandsError("");
+    if (brands.length > 0) return; // sudah pernah dimuat
+    setBrandsLoading(true);
+    try {
+      const res = await fetch("/api/admin/digiflazz/brands");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setBrands(data.brands as string[]);
+    } catch (e) {
+      setBrandsError(e instanceof Error ? e.message : "Gagal memuat daftar brand.");
+    } finally {
+      setBrandsLoading(false);
+    }
+  }
+
+  async function createFromBrand(brand: string) {
+    setCreatingBrand(brand);
+    setBrandsError("");
+    try {
+      const existing = games.find((g) => g.digiBrand.toUpperCase() === brand.toUpperCase());
+      let gameId = existing?.id;
+      if (!gameId) {
+        const res = await fetch("/api/admin/games", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: titleCase(brand), digiBrand: brand, sortOrder: games.length }),
+        });
+        const game = await res.json();
+        if (!res.ok) throw new Error(game.error ?? "Gagal membuat game");
+        gameId = game.id;
+      }
+      const syncRes = await fetch("/api/admin/digiflazz/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameId }),
+      });
+      const syncData = await syncRes.json();
+      if (!syncRes.ok) throw new Error(syncData.error ?? "Gagal menarik produk");
+      setDigiOpen(false);
+      setMessage({
+        type: "ok",
+        text: `${titleCase(brand)} berhasil ditambahkan. ${syncData.message} Jangan lupa pasang gambar & instruksi lewat tombol Edit.`,
+      });
+      router.refresh();
+    } catch (e) {
+      setBrandsError(e instanceof Error ? e.message : "Terjadi kesalahan.");
+    } finally {
+      setCreatingBrand(null);
+    }
+  }
 
   async function save() {
     if (!editing) return;
@@ -95,9 +165,14 @@ export default function GamesClient({ games }: { games: Game[] }) {
             Kelola daftar game, harga, dan sinkronisasi produk dari Digiflazz.
           </p>
         </div>
-        <button onClick={() => setEditing({ ...empty })} className="btn-primary">
-          <Plus size={16} aria-hidden /> Tambah Game
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={openDigiModal} className="btn-primary">
+            <Zap size={16} aria-hidden /> Tambah dari Digiflazz
+          </button>
+          <button onClick={() => setEditing({ ...empty })} className="btn-ghost">
+            <Plus size={16} aria-hidden /> Tambah Manual
+          </button>
+        </div>
       </div>
 
       {message && (
@@ -180,6 +255,72 @@ export default function GamesClient({ games }: { games: Game[] }) {
           </div>
         ))}
       </div>
+
+      {digiOpen && (
+        <Modal title="Tambah Game dari Digiflazz" onClose={() => setDigiOpen(false)}>
+          <div className="space-y-4">
+            <p className="text-sm text-muted">
+              Pilih brand — game langsung dibuat lengkap dengan <b>semua produk & harga</b> dari
+              price list Digiflazz kamu (harga jual otomatis = modal + markup di Pengaturan).
+            </p>
+
+            <div className="relative">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" aria-hidden />
+              <input
+                className="input !pl-9"
+                placeholder="Cari brand… mis. MOBILE LEGENDS"
+                value={brandQuery}
+                onChange={(e) => setBrandQuery(e.target.value)}
+                aria-label="Cari brand Digiflazz"
+              />
+            </div>
+
+            {brandsLoading && (
+              <p className="flex items-center gap-2 py-6 text-sm text-muted">
+                <Loader2 size={15} className="animate-spin" aria-hidden /> Memuat price list dari
+                Digiflazz…
+              </p>
+            )}
+
+            {brandsError && (
+              <p role="alert" className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
+                {brandsError}
+              </p>
+            )}
+
+            {!brandsLoading && brands.length > 0 && (
+              <ul className="max-h-72 space-y-1 overflow-y-auto pr-1">
+                {brands
+                  .filter((b) => b.toLowerCase().includes(brandQuery.trim().toLowerCase()))
+                  .slice(0, 60)
+                  .map((b) => {
+                    const already = games.some(
+                      (g) => g.digiBrand.toUpperCase() === b.toUpperCase()
+                    );
+                    return (
+                      <li key={b}>
+                        <button
+                          onClick={() => createFromBrand(b)}
+                          disabled={creatingBrand !== null}
+                          className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-line bg-surface-2 px-4 py-2.5 text-left text-sm font-medium transition hover:border-brand/40 disabled:opacity-50"
+                        >
+                          <span>{titleCase(b)}</span>
+                          {creatingBrand === b ? (
+                            <Loader2 size={14} className="animate-spin text-brand-soft" aria-hidden />
+                          ) : already ? (
+                            <span className="text-xs text-muted">sudah ada · sync ulang</span>
+                          ) : (
+                            <Plus size={14} className="text-brand-soft" aria-hidden />
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+              </ul>
+            )}
+          </div>
+        </Modal>
+      )}
 
       {editing && (
         <Modal title={editing.id ? "Edit Game" : "Tambah Game"} onClose={() => setEditing(null)}>
