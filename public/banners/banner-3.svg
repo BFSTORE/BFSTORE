@@ -15,7 +15,7 @@
   <circle cx="120" cy="470" r="200" fill="#ffffff" opacity="0.04"/>
   <rect x="100" y="150" width="64" height="8" rx="4" fill="url(#acc)"/>
   <text x="100" y="256" font-family="Arial Black, Arial, sans-serif" font-size="72" font-weight="900" font-style="italic" fill="#ffffff">HARGA TERBAIK</text>
-  <text x="100" y="316" font-family="Arial, sans-serif" font-size="28" fill="#ffffff" opacity="0.75">Langsung dari distributor resmi Digiflazz</text>
+  <text x="100" y="316" font-family="Arial, sans-serif" font-size="28" fill="#ffffff" opacity="0.75">Langsung dari distributor resmi &amp; terpercaya</text>
   <g transform="translate(100,360)">
     <rect width="220" height="56" rx="28" fill="#2dd4bf"/>
     <text x="110" y="36" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#052e16">Top Up Sekarang</text>

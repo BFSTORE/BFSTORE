@@ -34,7 +34,7 @@ export default async function HomePage() {
       <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {[
           { icon: Zap, title: "Proses Instan", desc: "Otomatis 24 jam nonstop" },
-          { icon: ShieldCheck, title: "Aman & Resmi", desc: "Distributor resmi Digiflazz" },
+          { icon: ShieldCheck, title: "Aman & Resmi", desc: "Produk 100% legal & bergaransi" },
           { icon: BadgePercent, title: "Harga Terbaik", desc: "Promo & diskon tiap minggu" },
         ].map(({ icon: Icon, title, desc }) => (
           <div key={title} className="card flex items-center gap-4 px-5 py-4">
