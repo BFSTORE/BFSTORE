@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       message:
-        "Layanan email sedang tidak tersedia. Silakan hubungi CS BFSTORE via WhatsApp untuk bantuan reset kata sandi.",
+        "Pengiriman otomatis sedang tidak tersedia. Silakan kirim email ke cs@bfstore.id dari alamat email akunmu untuk bantuan reset kata sandi.",
     });
   }
 

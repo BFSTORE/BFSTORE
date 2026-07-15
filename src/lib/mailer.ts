@@ -68,7 +68,7 @@ export async function sendInvoiceEmail(order: OrderForEmail, kind: "created" | "
     <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:12px;overflow:hidden;margin:16px 0">${rows}</table>
     <p style="color:#475569;font-size:13px;line-height:1.6">
       Cek status pesananmu kapan saja di halaman <b>Cek Transaksi</b> dengan nomor invoice di atas.
-      Butuh bantuan? Balas email ini atau hubungi WhatsApp CS kami.
+      Butuh bantuan? Cukup balas email ini — tim CS kami siap membantu.
     </p>
     <p style="color:#94a3b8;font-size:12px">© ${new Date().getFullYear()} BFSTORE — Top up game cepat & terpercaya</p>
   </div>`;

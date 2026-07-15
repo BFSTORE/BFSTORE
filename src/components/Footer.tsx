@@ -71,8 +71,15 @@ export default function Footer() {
         <div>
           <h3 className="text-sm font-semibold">Bantuan</h3>
           <ul className="mt-4 space-y-2.5 text-sm text-muted">
-            <li>WhatsApp: 0812-3456-7890</li>
-            <li>Email: cs@bfstore.id</li>
+            <li>
+              <a href="mailto:cs@bfstore.id" className="transition hover:text-brand-soft">
+                cs@bfstore.id
+              </a>{" "}
+              <span className="text-xs">(kanal utama)</span>
+            </li>
+            <li>
+              WhatsApp <span className="text-xs">(khusus kendala mendesak)</span>
+            </li>
             <li>Jam operasional: 24 jam</li>
           </ul>
         </div>

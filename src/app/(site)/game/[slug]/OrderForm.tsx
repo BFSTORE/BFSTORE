@@ -52,7 +52,8 @@ export default function OrderForm({ game, products }: { game: Game; products: Pr
     if (!product) return setError("Pilih nominal top up dulu ya.");
     if (!customerNo.trim()) return setError(`${game.fieldLabel} wajib diisi.`);
     if (game.fieldLabel2 && !customerNo2.trim()) return setError(`${game.fieldLabel2} wajib diisi.`);
-    if (!contact.trim()) return setError("Nomor WhatsApp / email wajib diisi untuk konfirmasi.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.trim()))
+      return setError("Masukkan alamat email yang valid — invoice akan dikirim ke sana.");
 
     setSubmitting(true);
     try {
@@ -207,16 +208,20 @@ export default function OrderForm({ game, products }: { game: Game; products: Pr
               )}
             </div>
             <div>
-              <label htmlFor="contact" className="label">No. WhatsApp / Email <span className="text-rose-400">*</span></label>
+              <label htmlFor="contact" className="label">Email <span className="text-rose-400">*</span></label>
               <input
                 id="contact"
+                type="email"
                 className="input"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                placeholder="Untuk konfirmasi pesanan"
+                placeholder="nama@email.com"
                 inputMode="email"
+                autoComplete="email"
               />
-              <p className="mt-1.5 text-xs text-muted">Bukti transaksi akan dikirim ke kontak ini.</p>
+              <p className="mt-1.5 text-xs text-muted">
+                Invoice dan bukti transaksi otomatis dikirim ke email ini.
+              </p>
             </div>
           </div>
         </section>

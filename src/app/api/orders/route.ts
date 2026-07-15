@@ -13,6 +13,12 @@ export async function POST(req: Request) {
   if (!gameId || !productId || !customerNo?.trim() || !contact?.trim()) {
     return NextResponse.json({ error: "Data pesanan tidak lengkap." }, { status: 400 });
   }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(contact).trim())) {
+    return NextResponse.json(
+      { error: "Kontak harus berupa alamat email yang valid." },
+      { status: 400 }
+    );
+  }
 
   const product = await db.product.findUnique({
     where: { id: Number(productId) },

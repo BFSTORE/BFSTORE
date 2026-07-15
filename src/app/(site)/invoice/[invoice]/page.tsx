@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Clock, CheckCircle2, XCircle, MessageCircle, ArrowLeft } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, Mail, ArrowLeft } from "lucide-react";
 import { db } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { getMidtransConfig } from "@/lib/midtrans";
@@ -16,8 +16,14 @@ export default async function InvoicePage({ params }: { params: Promise<{ invoic
   const [settings, midtrans] = await Promise.all([getSettings(), getMidtransConfig()]);
   const status = ORDER_STATUS[order.status] ?? ORDER_STATUS.PENDING;
 
+  const csEmail = settings.smtpUser?.trim() || "cs@bfstore.id";
+  const mailSubject = encodeURIComponent(`Konfirmasi Pembayaran — Invoice ${order.invoice}`);
+  const mailBody = encodeURIComponent(
+    `Halo BFSTORE,\n\nSaya mau konfirmasi pembayaran untuk pesanan berikut:\n\nInvoice: ${order.invoice}\nItem: ${order.gameName} — ${order.productName}\nTotal: ${formatIDR(order.total)}\n\nBukti pembayaran saya lampirkan di email ini.\nTerima kasih!`
+  );
+  const mailLink = `mailto:${csEmail}?subject=${mailSubject}&body=${mailBody}`;
   const waText = encodeURIComponent(
-    `Halo BFSTORE, saya mau konfirmasi pembayaran untuk invoice ${order.invoice} (${order.gameName} — ${order.productName}, total ${formatIDR(order.total)}).`
+    `[MENDESAK] Halo BFSTORE, saya butuh bantuan untuk invoice ${order.invoice}.`
   );
   const waLink = `https://wa.me/${settings.whatsapp ?? ""}?text=${waText}`;
 
@@ -90,27 +96,33 @@ export default async function InvoicePage({ params }: { params: Promise<{ invoic
                 <div className="mt-4">
                   <PayButton invoice={order.invoice} />
                 </div>
-                <a
-                  href={waLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-ghost mt-3 w-full !py-3"
-                >
-                  <MessageCircle size={16} aria-hidden /> Bantuan via WhatsApp
+                <a href={mailLink} className="btn-ghost mt-3 w-full !py-3">
+                  <Mail size={16} aria-hidden /> Bantuan via Email CS
                 </a>
               </>
             ) : (
               <>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted">
                   Pembayaran otomatis sedang disiapkan. Untuk saat ini, silakan konfirmasi
-                  pembayaran melalui WhatsApp admin — pesanan akan diproses begitu pembayaran
-                  diterima.
+                  pembayaran melalui email CS — lampirkan bukti transfer, pesanan diproses begitu
+                  pembayaran diterima.
                 </p>
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary mt-4 w-full !py-3">
-                  <MessageCircle size={16} aria-hidden /> Konfirmasi via WhatsApp
+                <a href={mailLink} className="btn-primary mt-4 w-full !py-3">
+                  <Mail size={16} aria-hidden /> Konfirmasi via Email
                 </a>
               </>
             )}
+            <p className="mt-3 text-center text-xs text-muted">
+              Kendala mendesak (pembayaran terpotong tapi pesanan gagal)?{" "}
+              <a
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-brand-soft underline-offset-2 hover:underline"
+              >
+                WhatsApp CS
+              </a>
+            </p>
           </div>
         )}
 

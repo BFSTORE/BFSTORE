@@ -75,7 +75,9 @@ const sections: { title: string; items: string[] }[] = [
   {
     title: "8. Kontak",
     items: [
-      "Pertanyaan seputar Syarat & Ketentuan, transaksi, maupun refund dapat disampaikan melalui WhatsApp CS, email cs@bfstore.id, atau Instagram @bfstoredotid.",
+      "Seluruh layanan pelanggan — pertanyaan, konfirmasi pembayaran, refund, hingga reset kata sandi — dilayani melalui email cs@bfstore.id sebagai kanal utama.",
+      "WhatsApp CS hanya digunakan untuk kendala mendesak, misalnya pembayaran sudah terpotong namun pesanan gagal diproses.",
+      "Info dan promo terbaru dapat diikuti melalui Instagram @bfstoredotid.",
     ],
   },
 ];
