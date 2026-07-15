@@ -84,6 +84,17 @@ export default function LoginPage() {
             {loading && <Loader2 size={16} className="animate-spin" aria-hidden />}
             Masuk
           </button>
+
+          <p className="text-center text-xs leading-relaxed text-muted">
+            Dengan masuk, kamu menyetujui{" "}
+            <Link
+              href="/syarat-ketentuan"
+              className="font-semibold text-brand-soft underline-offset-2 hover:underline"
+            >
+              Syarat & Ketentuan
+            </Link>{" "}
+            BFSTORE.
+          </p>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">

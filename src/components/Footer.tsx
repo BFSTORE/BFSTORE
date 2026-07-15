@@ -63,6 +63,7 @@ export default function Footer() {
             <li><a href="/#games" className="transition hover:text-brand-soft">Semua Game</a></li>
             <li><Link href="/cek-transaksi" className="transition hover:text-brand-soft">Cek Transaksi</Link></li>
             <li><Link href="/kalkulator" className="transition hover:text-brand-soft">Kalkulator</Link></li>
+            <li><Link href="/syarat-ketentuan" className="transition hover:text-brand-soft">Syarat & Ketentuan</Link></li>
             <li><Link href="/login" className="transition hover:text-brand-soft">Masuk / Daftar</Link></li>
           </ul>
         </div>

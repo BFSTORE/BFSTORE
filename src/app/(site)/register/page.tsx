@@ -87,6 +87,17 @@ export default function RegisterPage() {
             {loading && <Loader2 size={16} className="animate-spin" aria-hidden />}
             Daftar
           </button>
+
+          <p className="text-center text-xs leading-relaxed text-muted">
+            Dengan mendaftar, kamu menyetujui{" "}
+            <Link
+              href="/syarat-ketentuan"
+              className="font-semibold text-brand-soft underline-offset-2 hover:underline"
+            >
+              Syarat & Ketentuan
+            </Link>{" "}
+            BFSTORE.
+          </p>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">
