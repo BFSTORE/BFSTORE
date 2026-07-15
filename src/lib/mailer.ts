@@ -81,3 +81,51 @@ export async function sendInvoiceEmail(order: OrderForEmail, kind: "created" | "
   });
   return { sent: true };
 }
+
+/** Kirim tautan reset kata sandi. Mengembalikan sent:false bila email belum dikonfigurasi. */
+export async function sendPasswordResetEmail(to: string, name: string, resetLink: string) {
+  const s = await getSettings();
+  const user = s.smtpUser?.trim();
+  const pass = s.smtpPass?.trim();
+  if (s.emailEnabled !== "1" || !user || !pass) {
+    return { sent: false, reason: "Email belum dikonfigurasi" };
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: { user, pass },
+  });
+
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;padding:24px">
+    <h2 style="font-style:italic;margin:0 0 4px">BF<span style="color:#16a34a">STORE</span></h2>
+    <h3 style="margin:16px 0 4px">Reset Kata Sandi</h3>
+    <p style="color:#475569;font-size:14px;line-height:1.6">
+      Halo ${name}, kami menerima permintaan untuk mengganti kata sandi akun BFSTORE kamu.
+      Klik tombol di bawah untuk membuat kata sandi baru. Tautan ini berlaku selama <b>1 jam</b>.
+    </p>
+    <p style="text-align:center;margin:24px 0">
+      <a href="${resetLink}" style="display:inline-block;background:#16a34a;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:10px">
+        Buat Kata Sandi Baru
+      </a>
+    </p>
+    <p style="color:#475569;font-size:13px;line-height:1.6">
+      Kalau tombol tidak berfungsi, salin tautan ini ke browser:<br>
+      <a href="${resetLink}" style="color:#16a34a;word-break:break-all">${resetLink}</a>
+    </p>
+    <p style="color:#475569;font-size:13px;line-height:1.6">
+      Tidak merasa meminta reset? Abaikan email ini — kata sandimu tetap aman.
+    </p>
+    <p style="color:#94a3b8;font-size:12px">© ${new Date().getFullYear()} BFSTORE — Top up game cepat & terpercaya</p>
+  </div>`;
+
+  await transporter.sendMail({
+    from: `"BFSTORE" <${user}>`,
+    to: to.trim(),
+    subject: "Reset Kata Sandi BFSTORE",
+    html,
+  });
+  return { sent: true };
+}

@@ -9,13 +9,15 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("CUSTOMER") // ADMIN | CUSTOMER
-  orders    Order[]
-  createdAt DateTime @default(now())
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String
+  role          String    @default("CUSTOMER") // ADMIN | CUSTOMER
+  resetToken    String    @default("") // hash SHA-256 dari token reset password
+  resetTokenExp DateTime?
+  orders        Order[]
+  createdAt     DateTime  @default(now())
 }
 
 model Game {

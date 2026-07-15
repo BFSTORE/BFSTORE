@@ -52,7 +52,15 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="label">Kata Sandi</label>
+            <div className="mb-1.5 flex items-center justify-between">
+              <label htmlFor="password" className="!mb-0 label">Kata Sandi</label>
+              <Link
+                href="/lupa-password"
+                className="text-xs font-medium text-brand-soft underline-offset-2 hover:underline"
+              >
+                Lupa kata sandi?
+              </Link>
+            </div>
             <div className="relative">
               <input
                 id="password"
