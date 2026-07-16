@@ -7,6 +7,15 @@ import { withAdmin } from "@/lib/admin-route";
 const ALLOWED = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif"];
 const MAX_SIZE = 4 * 1024 * 1024; // 4 MB
 
+/** Cari token Vercel Blob apa pun nama variabelnya (BLOB_… atau <NAMA_STORE>_…). */
+function getBlobToken(): string | undefined {
+  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
+  for (const [key, value] of Object.entries(process.env)) {
+    if (key.endsWith("_READ_WRITE_TOKEN") && value?.startsWith("vercel_blob_rw_")) return value;
+  }
+  return undefined;
+}
+
 export async function POST(req: Request) {
   return withAdmin(async () => {
     const form = await req.formData();
@@ -23,8 +32,9 @@ export async function POST(req: Request) {
     const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
 
     // Di Vercel: simpan ke Vercel Blob (penyimpanan cloud)
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const blob = await put(`uploads/${name}`, file, { access: "public" });
+    const blobToken = getBlobToken();
+    if (blobToken) {
+      const blob = await put(`uploads/${name}`, file, { access: "public", token: blobToken });
       return NextResponse.json({ ok: true, url: blob.url });
     }
     if (process.env.VERCEL) {
