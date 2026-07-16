@@ -27,6 +27,15 @@ export async function POST(req: Request) {
       const blob = await put(`uploads/${name}`, file, { access: "public" });
       return NextResponse.json({ ok: true, url: blob.url });
     }
+    if (process.env.VERCEL) {
+      return NextResponse.json(
+        {
+          error:
+            "Penyimpanan gambar belum diaktifkan. Buka dashboard Vercel → project bfstore → Storage → Create Database → Blob → Connect, lalu Redeploy. Sementara itu, tempel URL gambar saja di kolomnya.",
+        },
+        { status: 503 }
+      );
+    }
 
     // Di komputer lokal: simpan ke folder public/uploads
     const dir = path.join(process.cwd(), "public", "uploads");
