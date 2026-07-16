@@ -7,11 +7,20 @@ import { withAdmin } from "@/lib/admin-route";
 const ALLOWED = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif"];
 const MAX_SIZE = 4 * 1024 * 1024; // 4 MB
 
-/** Cari token Vercel Blob apa pun nama variabelnya (BLOB_… atau <NAMA_STORE>_…). */
+/**
+ * Cari token Vercel Blob apa pun nama variabelnya, dan bersihkan nilainya —
+ * toleran terhadap tanda kutip / seluruh baris `NAMA="vercel_blob_rw_…"` yang ikut tertempel.
+ */
 function getBlobToken(): string | undefined {
-  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
-  for (const [key, value] of Object.entries(process.env)) {
-    if (key.endsWith("_READ_WRITE_TOKEN") && value?.startsWith("vercel_blob_rw_")) return value;
+  const candidates = [
+    process.env.BLOB_READ_WRITE_TOKEN,
+    ...Object.entries(process.env)
+      .filter(([key]) => key.endsWith("_READ_WRITE_TOKEN"))
+      .map(([, value]) => value),
+  ];
+  for (const raw of candidates) {
+    const match = raw?.match(/vercel_blob_rw_[A-Za-z0-9_]+/);
+    if (match) return match[0];
   }
   return undefined;
 }
