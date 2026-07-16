@@ -1,30 +1,11 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { put } from "@vercel/blob";
+import { db } from "@/lib/db";
 import { withAdmin } from "@/lib/admin-route";
 
 const ALLOWED = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif"];
 const MAX_SIZE = 4 * 1024 * 1024; // 4 MB
 
-/**
- * Cari token Vercel Blob apa pun nama variabelnya, dan bersihkan nilainya —
- * toleran terhadap tanda kutip / seluruh baris `NAMA="vercel_blob_rw_…"` yang ikut tertempel.
- */
-function getBlobToken(): string | undefined {
-  const candidates = [
-    process.env.BLOB_READ_WRITE_TOKEN,
-    ...Object.entries(process.env)
-      .filter(([key]) => key.endsWith("_READ_WRITE_TOKEN"))
-      .map(([, value]) => value),
-  ];
-  for (const raw of candidates) {
-    const match = raw?.match(/vercel_blob_rw_[A-Za-z0-9_]+/);
-    if (match) return match[0];
-  }
-  return undefined;
-}
-
+/** Simpan gambar ke database — tanpa penyimpanan file eksternal, bekerja di mana pun. */
 export async function POST(req: Request) {
   return withAdmin(async () => {
     const form = await req.formData();
@@ -37,30 +18,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Ukuran maksimal 4 MB." }, { status: 400 });
     }
 
-    const ext = path.extname(file.name) || ".png";
-    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
+    const asset = await db.imageAsset.create({
+      data: {
+        name: file.name,
+        mime: file.type,
+        data: Buffer.from(await file.arrayBuffer()),
+      },
+      select: { id: true },
+    });
 
-    // Di Vercel: simpan ke Vercel Blob (penyimpanan cloud)
-    const blobToken = getBlobToken();
-    if (blobToken) {
-      const blob = await put(`uploads/${name}`, file, { access: "public", token: blobToken });
-      return NextResponse.json({ ok: true, url: blob.url });
-    }
-    if (process.env.VERCEL) {
-      return NextResponse.json(
-        {
-          error:
-            "Penyimpanan gambar belum diaktifkan. Buka dashboard Vercel → project bfstore → Storage → Create Database → Blob → Connect, lalu Redeploy. Sementara itu, tempel URL gambar saja di kolomnya.",
-        },
-        { status: 503 }
-      );
-    }
-
-    // Di komputer lokal: simpan ke folder public/uploads
-    const dir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(dir, { recursive: true });
-    await writeFile(path.join(dir, name), Buffer.from(await file.arrayBuffer()));
-
-    return NextResponse.json({ ok: true, url: `/uploads/${name}` });
+    return NextResponse.json({ ok: true, url: `/api/images/${asset.id}` });
   });
 }

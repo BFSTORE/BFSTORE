@@ -118,3 +118,11 @@ model Setting {
   key   String @id
   value String
 }
+
+model ImageAsset {
+  id        String   @id @default(cuid())
+  name      String
+  mime      String
+  data      Bytes
+  createdAt DateTime @default(now())
+}
