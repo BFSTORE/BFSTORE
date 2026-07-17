@@ -1,26 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#4ade80"/>
-      <stop offset="0.5" stop-color="#22c55e"/>
-      <stop offset="1" stop-color="#15803d"/>
-    </linearGradient>
-  </defs>
-  <circle cx="60" cy="60" r="54" fill="none" stroke="url(#g)" stroke-width="7"/>
-  <g fill="url(#g)">
-    <line x1="104.0" y1="60.0" x2="109.0" y2="60.0" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="98.1" y1="82.0" x2="102.4" y2="84.5" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="82.0" y1="98.1" x2="84.5" y2="102.4" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="60.0" y1="104.0" x2="60.0" y2="109.0" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="38.0" y1="98.1" x2="35.5" y2="102.4" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="21.9" y1="82.0" x2="17.6" y2="84.5" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="16.0" y1="60.0" x2="11.0" y2="60.0" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="21.9" y1="38.0" x2="17.6" y2="35.5" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="38.0" y1="21.9" x2="35.5" y2="17.6" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="60.0" y1="16.0" x2="60.0" y2="11.0" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="82.0" y1="21.9" x2="84.5" y2="17.6" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="98.1" y1="38.0" x2="102.4" y2="35.5" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round"/>
-  </g>
-  <text x="60" y="62" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="34" font-weight="900" font-style="italic" fill="url(#g)">BF</text>
-  <text x="60" y="84" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="13" font-weight="900" font-style="italic" letter-spacing="2" fill="url(#g)">STORE</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#060806"/>
+  <text x="256" y="291" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="92" font-weight="900" font-style="italic" letter-spacing="-2"><tspan fill="#ffffff">BF</tspan><tspan fill="#22c55e">STORE</tspan></text>
 </svg>
