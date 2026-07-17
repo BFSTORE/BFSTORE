@@ -46,6 +46,7 @@ model Product {
   game      Game       @relation(fields: [gameId], references: [id], onDelete: Cascade)
   name      String
   sku       String     @default("") // buyer_sku_code Digiflazz
+  type      String     @default("Umum") // Umum | Membership (dari price list Digiflazz)
   basePrice Int        @default(0)  // harga modal dari Digiflazz
   price     Int // harga jual
   isActive  Boolean    @default(true)

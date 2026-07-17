@@ -63,7 +63,14 @@ export default async function GamePage({ params }: { params: Promise<{ slug: str
         }}
         products={game.products.map((p) => {
           const eff = effectivePrice(p, p.flashSale);
-          return { id: p.id, name: p.name, price: eff.price, original: eff.original, isFlash: eff.isFlash };
+          return {
+            id: p.id,
+            name: p.name,
+            price: eff.price,
+            original: eff.original,
+            isFlash: eff.isFlash,
+            type: p.type || "Umum",
+          };
         })}
       />
     </div>

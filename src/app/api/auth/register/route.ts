@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { createSession } from "@/lib/auth";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export async function POST(req: Request) {
-  const { name, email, password } = await req.json();
+  const { name, email, password, recaptchaToken } = await req.json();
   if (!name?.trim() || !email?.trim() || !password) {
     return NextResponse.json({ error: "Semua kolom wajib diisi." }, { status: 400 });
   }
+  const rc = await verifyRecaptcha(recaptchaToken);
+  if (!rc.ok) return NextResponse.json({ error: rc.error }, { status: 400 });
   if (String(password).length < 6) {
     return NextResponse.json({ error: "Kata sandi minimal 6 karakter." }, { status: 400 });
   }

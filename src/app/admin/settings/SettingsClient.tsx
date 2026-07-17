@@ -20,6 +20,9 @@ export default function SettingsClient({ initial }: { initial: Record<string, st
     smtpUser: initial.smtpUser ?? "cs@bfstore.id",
     smtpPass: initial.smtpPass ?? "",
     emailEnabled: initial.emailEnabled ?? "0",
+    recaptchaSiteKey: initial.recaptchaSiteKey ?? "",
+    recaptchaSecretKey: initial.recaptchaSecretKey ?? "",
+    recaptchaEnabled: initial.recaptchaEnabled ?? "0",
   });
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -297,6 +300,52 @@ export default function SettingsClient({ initial }: { initial: Record<string, st
             )}
             Tes Kirim Email
           </button>
+        </div>
+      </section>
+
+      <section className="card mt-5 p-6" aria-labelledby="s-recaptcha">
+        <div className="flex items-center justify-between gap-3">
+          <h2 id="s-recaptcha" className="font-semibold">reCAPTCHA (Anti-Bot)</h2>
+          <Toggle
+            checked={form.recaptchaEnabled === "1"}
+            onChange={(v) => set("recaptchaEnabled", v ? "1" : "0")}
+            label="Aktif"
+          />
+        </div>
+        <p className="mt-1 text-sm text-muted">
+          Melindungi halaman masuk, daftar, dan lupa kata sandi dari bot. Kelola kunci di{" "}
+          <a
+            href="https://www.google.com/recaptcha/admin"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-soft underline-offset-2 hover:underline"
+          >
+            google.com/recaptcha/admin
+          </a>{" "}
+          (pilih tipe v2 &quot;I&apos;m not a robot&quot; Checkbox).
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label" htmlFor="rc-site">Site Key</label>
+            <input
+              id="rc-site"
+              className="input"
+              value={form.recaptchaSiteKey}
+              onChange={(e) => set("recaptchaSiteKey", e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="rc-secret">Secret Key</label>
+            <input
+              id="rc-secret"
+              type="password"
+              className="input"
+              value={form.recaptchaSecretKey}
+              onChange={(e) => set("recaptchaSecretKey", e.target.value)}
+              autoComplete="off"
+            />
+          </div>
         </div>
       </section>
 

@@ -6,7 +6,14 @@ import { Loader2, TicketPercent, CheckCircle2, XCircle, Zap } from "lucide-react
 import { formatIDR } from "@/lib/utils";
 
 type Game = { id: number; name: string; fieldLabel: string; fieldLabel2: string };
-type Product = { id: number; name: string; price: number; original: number; isFlash: boolean };
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  original: number;
+  isFlash: boolean;
+  type: string;
+};
 
 export default function OrderForm({ game, products }: { game: Game; products: Product[] }) {
   const router = useRouter();
@@ -24,6 +31,18 @@ export default function OrderForm({ game, products }: { game: Game; products: Pr
   const [error, setError] = useState("");
 
   const product = useMemo(() => products.find((p) => p.id === productId) ?? null, [productId, products]);
+
+  // Kelompokkan produk: Umum dulu, lalu Membership, lalu tipe lain
+  const groups = useMemo(() => {
+    const map = new Map<string, Product[]>();
+    for (const p of products) {
+      const t = p.type || "Umum";
+      if (!map.has(t)) map.set(t, []);
+      map.get(t)!.push(p);
+    }
+    const order = (t: string) => (t === "Umum" ? 0 : t === "Membership" ? 1 : 2);
+    return [...map.entries()].sort((a, b) => order(a[0]) - order(b[0]) || a[0].localeCompare(b[0]));
+  }, [products]);
   const discount = promoState.status === "valid" ? promoState.discount : 0;
   const total = product ? Math.max(product.price - discount, 0) : 0;
 
@@ -127,32 +146,55 @@ export default function OrderForm({ game, products }: { game: Game; products: Pr
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand/15 text-sm font-bold text-brand-soft">2</span>
             {steps[1].title}
           </h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Pilihan nominal">
-            {products.map((p) => (
-              <button
-                key={p.id}
-                role="radio"
-                aria-checked={productId === p.id}
-                onClick={() => setProductId(p.id)}
-                className={`relative cursor-pointer rounded-xl border p-4 text-left transition ${
-                  productId === p.id
-                    ? "border-brand bg-brand/10 ring-2 ring-brand/30"
-                    : "border-line bg-surface-2 hover:border-brand/40"
-                }`}
-              >
-                {p.isFlash && (
-                  <span className="absolute -top-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950">
-                    <Zap size={10} aria-hidden /> FLASH SALE
-                  </span>
+          <div className="space-y-6">
+            {groups.map(([type, items]) => (
+              <div key={type}>
+                {groups.length > 1 && (
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-muted">
+                    <span
+                      className={`badge border ${
+                        type === "Membership"
+                          ? "border-violet-500/30 bg-violet-500/10 text-violet-300"
+                          : "border-brand/30 bg-brand/10 text-brand-soft"
+                      }`}
+                    >
+                      {type}
+                    </span>
+                  </h3>
                 )}
-                <p className="text-sm font-semibold leading-snug">{p.name}</p>
-                {p.isFlash && (
-                  <p className="mt-1 text-xs tabular-nums text-muted line-through">{formatIDR(p.original)}</p>
-                )}
-                <p className={`mt-1 text-sm font-bold tabular-nums ${p.isFlash ? "text-amber-300" : productId === p.id ? "text-brand-soft" : "text-muted"}`}>
-                  {formatIDR(p.price)}
-                </p>
-              </button>
+                <div
+                  className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+                  role="radiogroup"
+                  aria-label={`Pilihan nominal ${type}`}
+                >
+                  {items.map((p) => (
+                    <button
+                      key={p.id}
+                      role="radio"
+                      aria-checked={productId === p.id}
+                      onClick={() => setProductId(p.id)}
+                      className={`relative cursor-pointer rounded-xl border p-4 text-left transition ${
+                        productId === p.id
+                          ? "border-brand bg-brand/10 ring-2 ring-brand/30"
+                          : "border-line bg-surface-2 hover:border-brand/40"
+                      }`}
+                    >
+                      {p.isFlash && (
+                        <span className="absolute -top-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950">
+                          <Zap size={10} aria-hidden /> FLASH SALE
+                        </span>
+                      )}
+                      <p className="text-sm font-semibold leading-snug">{p.name}</p>
+                      {p.isFlash && (
+                        <p className="mt-1 text-xs tabular-nums text-muted line-through">{formatIDR(p.original)}</p>
+                      )}
+                      <p className={`mt-1 text-sm font-bold tabular-nums ${p.isFlash ? "text-amber-300" : productId === p.id ? "text-brand-soft" : "text-muted"}`}>
+                        {formatIDR(p.price)}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
           {products.length === 0 && (

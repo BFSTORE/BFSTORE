@@ -45,10 +45,11 @@ export async function POST(req: Request) {
       const existing = await db.product.findFirst({
         where: { gameId: game.id, sku: item.buyer_sku_code },
       });
+      const productType = item.type?.trim() || "Umum";
       if (existing) {
         await db.product.update({
           where: { id: existing.id },
-          data: { basePrice: item.price, price: sellPrice, name: item.product_name },
+          data: { basePrice: item.price, price: sellPrice, name: item.product_name, type: productType },
         });
         updated++;
       } else {
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
             gameId: game.id,
             name: item.product_name,
             sku: item.buyer_sku_code,
+            type: productType,
             basePrice: item.price,
             price: sellPrice,
             sortOrder: item.price,

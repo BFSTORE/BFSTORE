@@ -2,16 +2,19 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { db } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/mailer";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 /**
  * Minta tautan reset kata sandi.
  * Respons selalu generik (tidak membocorkan apakah email terdaftar).
  */
 export async function POST(req: Request) {
-  const { email } = await req.json();
+  const { email, recaptchaToken } = await req.json();
   if (!email?.trim()) {
     return NextResponse.json({ error: "Email wajib diisi." }, { status: 400 });
   }
+  const rc = await verifyRecaptcha(recaptchaToken);
+  if (!rc.ok) return NextResponse.json({ error: rc.error }, { status: 400 });
 
   const genericOk = {
     ok: true,

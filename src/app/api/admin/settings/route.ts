@@ -20,6 +20,9 @@ export async function POST(req: Request) {
       "smtpUser",
       "smtpPass",
       "emailEnabled",
+      "recaptchaSiteKey",
+      "recaptchaSecretKey",
+      "recaptchaEnabled",
     ];
     const values: Record<string, string> = {};
     for (const key of allowed) {
