@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import Recaptcha, { getRecaptchaToken, resetRecaptcha } from "@/components/Recaptcha";
+import RecaptchaNotice, { executeRecaptcha } from "@/components/Recaptcha";
 
 export default function RegisterForm({ siteKey }: { siteKey: string }) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -17,10 +17,11 @@ export default function RegisterForm({ siteKey }: { siteKey: string }) {
     if (form.password.length < 6) return setError("Kata sandi minimal 6 karakter.");
     setLoading(true);
     setError("");
+    const recaptchaToken = await executeRecaptcha(siteKey, "register");
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, recaptchaToken: getRecaptchaToken() }),
+      body: JSON.stringify({ ...form, recaptchaToken }),
     });
     const data = await res.json();
     if (res.ok) {
@@ -28,7 +29,6 @@ export default function RegisterForm({ siteKey }: { siteKey: string }) {
       router.refresh();
     } else {
       setError(data.error ?? "Gagal mendaftar");
-      resetRecaptcha();
       setLoading(false);
     }
   }
@@ -79,8 +79,6 @@ export default function RegisterForm({ siteKey }: { siteKey: string }) {
             <p className="mt-1.5 text-xs text-muted">Minimal 6 karakter.</p>
           </div>
 
-          <Recaptcha siteKey={siteKey} />
-
           {error && (
             <p role="alert" className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
               {error}
@@ -102,6 +100,8 @@ export default function RegisterForm({ siteKey }: { siteKey: string }) {
             </Link>{" "}
             BFSTORE.
           </p>
+
+          <RecaptchaNotice siteKey={siteKey} />
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">

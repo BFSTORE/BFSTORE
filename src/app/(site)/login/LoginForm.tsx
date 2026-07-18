@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import Recaptcha, { getRecaptchaToken, resetRecaptcha } from "@/components/Recaptcha";
+import RecaptchaNotice, { executeRecaptcha } from "@/components/Recaptcha";
 
 export default function LoginForm({ siteKey }: { siteKey: string }) {
   const [email, setEmail] = useState("");
@@ -18,10 +18,11 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
     e.preventDefault();
     setLoading(true);
     setError("");
+    const recaptchaToken = await executeRecaptcha(siteKey, "login");
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, recaptchaToken: getRecaptchaToken() }),
+      body: JSON.stringify({ email, password, recaptchaToken }),
     });
     const data = await res.json();
     if (res.ok) {
@@ -29,7 +30,6 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
       router.refresh();
     } else {
       setError(data.error ?? "Gagal masuk");
-      resetRecaptcha();
       setLoading(false);
     }
   }
@@ -84,8 +84,6 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
             </div>
           </div>
 
-          <Recaptcha siteKey={siteKey} />
-
           {error && (
             <p role="alert" className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
               {error}
@@ -107,6 +105,8 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
             </Link>{" "}
             BFSTORE.
           </p>
+
+          <RecaptchaNotice siteKey={siteKey} />
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">

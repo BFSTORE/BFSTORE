@@ -1,61 +1,73 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+/**
+ * reCAPTCHA v3 (invisible) — tanpa checkbox. Panggil executeRecaptcha(siteKey, action)
+ * saat submit untuk mendapatkan token; server memverifikasi skor di belakang layar.
+ */
 
-type Grecaptcha = {
-  render: (el: HTMLElement, opts: { sitekey: string; theme?: string }) => number;
-  getResponse: (id?: number) => string;
-  reset: (id?: number) => void;
+type GrecaptchaV3 = {
+  ready: (cb: () => void) => void;
+  execute: (siteKey: string, opts: { action: string }) => Promise<string>;
 };
 
 declare global {
   interface Window {
-    grecaptcha?: Grecaptcha;
-    __onRecaptchaLoad?: () => void;
+    grecaptcha?: GrecaptchaV3;
   }
 }
 
-/** Widget checkbox reCAPTCHA v2. Ambil token dengan getRecaptchaToken() saat submit. */
-export default function Recaptcha({ siteKey }: { siteKey: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const widgetId = useRef<number | null>(null);
+let loadingPromise: Promise<void> | null = null;
 
-  useEffect(() => {
-    if (!siteKey) return;
-    const render = () => {
-      if (ref.current && window.grecaptcha?.render && widgetId.current === null) {
-        try {
-          widgetId.current = window.grecaptcha.render(ref.current, {
-            sitekey: siteKey,
-            theme: "dark",
-          });
-        } catch {
-          // sudah pernah dirender (mis. hot reload) — abaikan
-        }
-      }
-    };
+function loadScript(siteKey: string): Promise<void> {
+  if (window.grecaptcha) return Promise.resolve();
+  if (loadingPromise) return loadingPromise;
+  loadingPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(siteKey)}`;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Gagal memuat reCAPTCHA"));
+    document.head.appendChild(script);
+  });
+  return loadingPromise;
+}
 
-    if (window.grecaptcha?.render) {
-      render();
-    } else {
-      window.__onRecaptchaLoad = render;
-      if (!document.querySelector('script[src*="recaptcha/api.js"]')) {
-        const script = document.createElement("script");
-        script.src = "https://www.google.com/recaptcha/api.js?render=explicit&onload=__onRecaptchaLoad";
-        script.async = true;
-        document.head.appendChild(script);
-      }
-    }
-  }, [siteKey]);
+/** Ambil token reCAPTCHA v3. Mengembalikan "" bila siteKey kosong (fitur nonaktif). */
+export async function executeRecaptcha(siteKey: string, action: string): Promise<string> {
+  if (!siteKey) return "";
+  try {
+    await loadScript(siteKey);
+    await new Promise<void>((r) => window.grecaptcha!.ready(r));
+    return await window.grecaptcha!.execute(siteKey, { action });
+  } catch {
+    return "";
+  }
+}
 
+/** Teks atribusi yang diwajibkan Google saat badge disembunyikan/tidak menonjol. */
+export default function RecaptchaNotice({ siteKey }: { siteKey: string }) {
   if (!siteKey) return null;
-  return <div ref={ref} className="flex justify-center" />;
-}
-
-export function getRecaptchaToken(): string {
-  return window.grecaptcha?.getResponse() ?? "";
-}
-
-export function resetRecaptcha() {
-  window.grecaptcha?.reset();
+  return (
+    <p className="text-center text-[11px] leading-relaxed text-muted/70">
+      Dilindungi reCAPTCHA —{" "}
+      <a
+        href="https://policies.google.com/privacy"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline-offset-2 hover:underline"
+      >
+        Privasi
+      </a>{" "}
+      &{" "}
+      <a
+        href="https://policies.google.com/terms"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline-offset-2 hover:underline"
+      >
+        Ketentuan
+      </a>{" "}
+      Google berlaku.
+    </p>
+  );
 }

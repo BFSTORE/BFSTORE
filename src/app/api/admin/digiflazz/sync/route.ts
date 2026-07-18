@@ -45,7 +45,11 @@ export async function POST(req: Request) {
       const existing = await db.product.findFirst({
         where: { gameId: game.id, sku: item.buyer_sku_code },
       });
-      const productType = item.type?.trim() || "Umum";
+      // Tipe dari Digiflazz; fallback: nama mengandung pass/member → Membership
+      let productType = item.type?.trim() || "Umum";
+      if (productType === "Umum" && /\b(pass|member|membership|langganan)\b/i.test(item.product_name)) {
+        productType = "Membership";
+      }
       if (existing) {
         await db.product.update({
           where: { id: existing.id },

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2, MailQuestion } from "lucide-react";
-import Recaptcha, { getRecaptchaToken, resetRecaptcha } from "@/components/Recaptcha";
+import RecaptchaNotice, { executeRecaptcha } from "@/components/Recaptcha";
 
 export default function ForgotForm({ siteKey }: { siteKey: string }) {
   const [email, setEmail] = useState("");
@@ -17,17 +17,17 @@ export default function ForgotForm({ siteKey }: { siteKey: string }) {
     setError("");
     setMessage("");
     try {
+      const recaptchaToken = await executeRecaptcha(siteKey, "forgot_password");
       const res = await fetch("/api/auth/forgot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, recaptchaToken: getRecaptchaToken() }),
+        body: JSON.stringify({ email, recaptchaToken }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setMessage(data.message);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan. Coba lagi ya.");
-      resetRecaptcha();
     } finally {
       setLoading(false);
     }
@@ -58,8 +58,6 @@ export default function ForgotForm({ siteKey }: { siteKey: string }) {
             />
           </div>
 
-          <Recaptcha siteKey={siteKey} />
-
           {message && (
             <p role="status" className="rounded-lg border border-brand/30 bg-brand/10 px-3 py-2.5 text-sm leading-relaxed text-brand-soft">
               {message}
@@ -75,6 +73,8 @@ export default function ForgotForm({ siteKey }: { siteKey: string }) {
             {loading && <Loader2 size={16} className="animate-spin" aria-hidden />}
             Kirim Tautan Reset
           </button>
+
+          <RecaptchaNotice siteKey={siteKey} />
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">
