@@ -23,6 +23,7 @@ export default function SettingsClient({ initial }: { initial: Record<string, st
     recaptchaSiteKey: initial.recaptchaSiteKey ?? "",
     recaptchaSecretKey: initial.recaptchaSecretKey ?? "",
     recaptchaEnabled: initial.recaptchaEnabled ?? "0",
+    recaptchaVersion: initial.recaptchaVersion ?? "v3",
   });
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -346,6 +347,22 @@ export default function SettingsClient({ initial }: { initial: Record<string, st
               autoComplete="off"
             />
           </div>
+        </div>
+        <div className="mt-4">
+          <label className="label" htmlFor="rc-version">Versi Kunci</label>
+          <select
+            id="rc-version"
+            className="input"
+            value={form.recaptchaVersion}
+            onChange={(e) => set("recaptchaVersion", e.target.value)}
+          >
+            <option value="v2">v2 — checkbox &quot;I&apos;m not a robot&quot;</option>
+            <option value="v3">v3 — tanpa checkbox (skor otomatis)</option>
+          </select>
+          <p className="mt-1.5 text-xs text-muted">
+            Harus sama dengan tipe yang dipilih saat membuat kunci di Google. Salah versi = login
+            selalu gagal.
+          </p>
         </div>
       </section>
 

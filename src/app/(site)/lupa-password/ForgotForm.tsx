@@ -3,9 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2, MailQuestion } from "lucide-react";
-import RecaptchaNotice, { executeRecaptcha } from "@/components/Recaptcha";
+import RecaptchaField, {
+  getRecaptchaToken,
+  resetRecaptcha,
+  type RecaptchaConfig,
+} from "@/components/Recaptcha";
 
-export default function ForgotForm({ siteKey }: { siteKey: string }) {
+export default function ForgotForm({ rc }: { rc: RecaptchaConfig }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -17,7 +21,12 @@ export default function ForgotForm({ siteKey }: { siteKey: string }) {
     setError("");
     setMessage("");
     try {
-      const recaptchaToken = await executeRecaptcha(siteKey, "forgot_password");
+      const recaptchaToken = await getRecaptchaToken(rc, "forgot_password");
+      if (recaptchaToken === null) {
+        setError("Centang kotak “I'm not a robot” dulu ya.");
+        setLoading(false);
+        return;
+      }
       const res = await fetch("/api/auth/forgot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -28,6 +37,7 @@ export default function ForgotForm({ siteKey }: { siteKey: string }) {
       setMessage(data.message);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan. Coba lagi ya.");
+      resetRecaptcha();
     } finally {
       setLoading(false);
     }
@@ -58,6 +68,8 @@ export default function ForgotForm({ siteKey }: { siteKey: string }) {
             />
           </div>
 
+          <RecaptchaField rc={rc} />
+
           {message && (
             <p role="status" className="rounded-lg border border-brand/30 bg-brand/10 px-3 py-2.5 text-sm leading-relaxed text-brand-soft">
               {message}
@@ -73,8 +85,6 @@ export default function ForgotForm({ siteKey }: { siteKey: string }) {
             {loading && <Loader2 size={16} className="animate-spin" aria-hidden />}
             Kirim Tautan Reset
           </button>
-
-          <RecaptchaNotice siteKey={siteKey} />
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">

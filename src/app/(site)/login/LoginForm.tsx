@@ -4,9 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import RecaptchaNotice, { executeRecaptcha } from "@/components/Recaptcha";
+import RecaptchaField, {
+  getRecaptchaToken,
+  resetRecaptcha,
+  type RecaptchaConfig,
+} from "@/components/Recaptcha";
 
-export default function LoginForm({ siteKey }: { siteKey: string }) {
+export default function LoginForm({ rc }: { rc: RecaptchaConfig }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -16,9 +20,12 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError("");
-    const recaptchaToken = await executeRecaptcha(siteKey, "login");
+    const recaptchaToken = await getRecaptchaToken(rc, "login");
+    if (recaptchaToken === null) {
+      return setError("Centang kotak “I'm not a robot” dulu ya.");
+    }
+    setLoading(true);
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -30,6 +37,7 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
       router.refresh();
     } else {
       setError(data.error ?? "Gagal masuk");
+      resetRecaptcha();
       setLoading(false);
     }
   }
@@ -84,6 +92,8 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
             </div>
           </div>
 
+          <RecaptchaField rc={rc} />
+
           {error && (
             <p role="alert" className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
               {error}
@@ -105,8 +115,6 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
             </Link>{" "}
             BFSTORE.
           </p>
-
-          <RecaptchaNotice siteKey={siteKey} />
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">

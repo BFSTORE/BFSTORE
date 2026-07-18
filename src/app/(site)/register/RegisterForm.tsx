@@ -4,9 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import RecaptchaNotice, { executeRecaptcha } from "@/components/Recaptcha";
+import RecaptchaField, {
+  getRecaptchaToken,
+  resetRecaptcha,
+  type RecaptchaConfig,
+} from "@/components/Recaptcha";
 
-export default function RegisterForm({ siteKey }: { siteKey: string }) {
+export default function RegisterForm({ rc }: { rc: RecaptchaConfig }) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -15,9 +19,12 @@ export default function RegisterForm({ siteKey }: { siteKey: string }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (form.password.length < 6) return setError("Kata sandi minimal 6 karakter.");
-    setLoading(true);
     setError("");
-    const recaptchaToken = await executeRecaptcha(siteKey, "register");
+    const recaptchaToken = await getRecaptchaToken(rc, "register");
+    if (recaptchaToken === null) {
+      return setError("Centang kotak “I'm not a robot” dulu ya.");
+    }
+    setLoading(true);
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -29,6 +36,7 @@ export default function RegisterForm({ siteKey }: { siteKey: string }) {
       router.refresh();
     } else {
       setError(data.error ?? "Gagal mendaftar");
+      resetRecaptcha();
       setLoading(false);
     }
   }
@@ -79,6 +87,8 @@ export default function RegisterForm({ siteKey }: { siteKey: string }) {
             <p className="mt-1.5 text-xs text-muted">Minimal 6 karakter.</p>
           </div>
 
+          <RecaptchaField rc={rc} />
+
           {error && (
             <p role="alert" className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
               {error}
@@ -100,8 +110,6 @@ export default function RegisterForm({ siteKey }: { siteKey: string }) {
             </Link>{" "}
             BFSTORE.
           </p>
-
-          <RecaptchaNotice siteKey={siteKey} />
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">

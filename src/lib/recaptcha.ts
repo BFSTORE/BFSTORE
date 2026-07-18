@@ -1,9 +1,12 @@
 import { getSettings } from "./settings";
 
-/** Site key untuk widget di halaman — kosong berarti reCAPTCHA nonaktif. */
-export async function getRecaptchaSiteKey(): Promise<string> {
+/** Konfigurasi untuk halaman — siteKey kosong berarti reCAPTCHA nonaktif. */
+export async function getRecaptchaConfig(): Promise<{ siteKey: string; version: "v2" | "v3" }> {
   const s = await getSettings();
-  return s.recaptchaEnabled === "1" ? (s.recaptchaSiteKey ?? "").trim() : "";
+  return {
+    siteKey: s.recaptchaEnabled === "1" ? (s.recaptchaSiteKey ?? "").trim() : "",
+    version: s.recaptchaVersion === "v2" ? "v2" : "v3",
+  };
 }
 
 /** Verifikasi token reCAPTCHA di server. Selalu lolos bila fitur nonaktif. */
