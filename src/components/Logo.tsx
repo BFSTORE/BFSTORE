@@ -1,11 +1,11 @@
 import Link from "next/link";
 
-export default function Logo({ className = "text-xl" }: { className?: string }) {
+/** Wordmark BFSTORE (gambar logo resmi). Atur ukuran lewat className tinggi, mis. "h-7". */
+export default function Logo({ className = "h-6" }: { className?: string }) {
   return (
     <Link href="/" aria-label="BFSTORE — Beranda" className="inline-flex items-center">
-      <span className={`font-heading font-extrabold italic tracking-tight ${className}`}>
-        BF<span className="text-brand">STORE</span>
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/logo-wide.svg" alt="BFSTORE" className={`w-auto ${className}`} />
     </Link>
   );
 }

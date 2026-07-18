@@ -31,7 +31,7 @@ export default async function Footer() {
     <footer className="mt-24 border-t border-line/60 bg-surface/50">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-4">
         <div className="md:col-span-2">
-          <Logo className="text-2xl" />
+          <Logo className="h-7" />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
             BFSTORE adalah platform top up game tercepat dan terpercaya di Indonesia. Proses
             otomatis 24 jam dengan harga terbaik langsung dari distributor resmi.

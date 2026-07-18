@@ -86,7 +86,7 @@ export default function AdminSidebar({ adminName }: { adminName: string }) {
     <>
       {/* Mobile top bar */}
       <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-line bg-surface px-4 md:hidden">
-        <Logo className="text-lg" />
+        <Logo className="h-5" />
         <button
           onClick={() => setOpen((v) => !v)}
           className="cursor-pointer rounded-lg p-2 text-muted"
@@ -111,7 +111,7 @@ export default function AdminSidebar({ adminName }: { adminName: string }) {
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line bg-surface/60 md:flex">
         <div className="px-6 py-6">
-          <Logo className="text-xl" />
+          <Logo className="h-6" />
           <p className="mt-1.5 text-xs font-medium uppercase tracking-wider text-muted">Panel Admin</p>
         </div>
         {nav}

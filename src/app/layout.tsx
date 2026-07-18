@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
   description:
     "BFSTORE: top up Mobile Legends, Free Fire, PUBG, Genshin Impact, dan game favoritmu. Proses instan 24 jam, harga terbaik, pembayaran aman.",
-  icons: { icon: "/logo.svg" },
+  icons: { icon: "/logo.svg?v=2" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
