@@ -15,10 +15,10 @@ export default async function AdminHome() {
   ]);
 
   const stats = [
-    { icon: Gamepad2, label: "Total Game", value: String(gameCount), href: "/admin/games" },
-    { icon: ReceiptText, label: "Total Pesanan", value: String(orderCount), href: "/admin/orders" },
-    { icon: TicketPercent, label: "Promo Aktif", value: String(promoCount), href: "/admin/promos" },
-    { icon: Wallet, label: "Omzet (Sukses)", value: formatIDR(revenueAgg._sum.total ?? 0), href: "/admin/orders" },
+    { icon: Gamepad2, label: "Total Game", value: String(gameCount), href: "/bfpanel/games" },
+    { icon: ReceiptText, label: "Total Pesanan", value: String(orderCount), href: "/bfpanel/orders" },
+    { icon: TicketPercent, label: "Promo Aktif", value: String(promoCount), href: "/bfpanel/promos" },
+    { icon: Wallet, label: "Omzet (Sukses)", value: formatIDR(revenueAgg._sum.total ?? 0), href: "/bfpanel/orders" },
   ];
 
   return (
@@ -41,7 +41,7 @@ export default async function AdminHome() {
       <div className="card mt-8 overflow-hidden">
         <div className="flex items-center justify-between border-b border-line px-6 py-4">
           <h2 className="font-semibold">Pesanan Terbaru</h2>
-          <Link href="/admin/orders" className="text-sm font-medium text-brand-soft hover:underline">
+          <Link href="/bfpanel/orders" className="text-sm font-medium text-brand-soft hover:underline">
             Lihat semua
           </Link>
         </div>

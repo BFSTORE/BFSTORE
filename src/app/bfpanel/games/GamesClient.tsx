@@ -220,7 +220,7 @@ export default function GamesClient({ games }: { games: Game[] }) {
             </div>
             <div className="flex border-t border-line">
               <Link
-                href={`/admin/games/${g.id}`}
+                href={`/bfpanel/games/${g.id}`}
                 className="flex flex-1 items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-muted transition hover:bg-surface-2 hover:text-ink"
               >
                 <Package size={13} aria-hidden /> Produk

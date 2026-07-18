@@ -21,15 +21,15 @@ import {
 import Logo from "../Logo";
 
 const items = [
-  { href: "/admin", label: "Ringkasan", icon: LayoutDashboard },
-  { href: "/admin/games", label: "Game & Produk", icon: Gamepad2 },
-  { href: "/admin/banners", label: "Slideshow Banner", icon: Images },
-  { href: "/admin/flashsale", label: "Flash Sale", icon: Zap },
-  { href: "/admin/promos", label: "Kode Promo", icon: TicketPercent },
-  { href: "/admin/orders", label: "Pesanan", icon: ReceiptText },
-  { href: "/admin/customers", label: "Pelanggan", icon: Users },
-  { href: "/admin/settings", label: "Pengaturan", icon: Settings },
-  { href: "/admin/account", label: "Akun Admin", icon: UserCog },
+  { href: "/bfpanel", label: "Ringkasan", icon: LayoutDashboard },
+  { href: "/bfpanel/games", label: "Game & Produk", icon: Gamepad2 },
+  { href: "/bfpanel/banners", label: "Slideshow Banner", icon: Images },
+  { href: "/bfpanel/flashsale", label: "Flash Sale", icon: Zap },
+  { href: "/bfpanel/promos", label: "Kode Promo", icon: TicketPercent },
+  { href: "/bfpanel/orders", label: "Pesanan", icon: ReceiptText },
+  { href: "/bfpanel/customers", label: "Pelanggan", icon: Users },
+  { href: "/bfpanel/settings", label: "Pengaturan", icon: Settings },
+  { href: "/bfpanel/account", label: "Akun Admin", icon: UserCog },
 ];
 
 export default function AdminSidebar({ adminName }: { adminName: string }) {
@@ -46,7 +46,7 @@ export default function AdminSidebar({ adminName }: { adminName: string }) {
   const nav = (
     <nav className="flex flex-1 flex-col gap-1 px-3" aria-label="Menu admin">
       {items.map(({ href, label, icon: Icon }) => {
-        const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+        const active = href === "/bfpanel" ? pathname === "/bfpanel" : pathname.startsWith(href);
         return (
           <Link
             key={href}

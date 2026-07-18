@@ -57,7 +57,7 @@ export default function ProductsClient({
   return (
     <div>
       <Link
-        href="/admin/games"
+        href="/bfpanel/games"
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-ink"
       >
         <ArrowLeft size={15} aria-hidden /> Kembali ke daftar game

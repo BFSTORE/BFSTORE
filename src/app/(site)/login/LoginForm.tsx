@@ -26,7 +26,7 @@ export default function LoginForm({ siteKey }: { siteKey: string }) {
     });
     const data = await res.json();
     if (res.ok) {
-      router.push(data.role === "ADMIN" ? "/admin" : "/");
+      router.push(data.role === "ADMIN" ? "/bfpanel" : "/");
       router.refresh();
     } else {
       setError(data.error ?? "Gagal masuk");

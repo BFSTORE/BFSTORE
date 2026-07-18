@@ -2,7 +2,10 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
-export const metadata = { title: "Dashboard Admin" };
+export const metadata = {
+  title: "Dashboard Admin",
+  robots: { index: false, follow: false }, // jangan pernah muncul di mesin pencari
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();

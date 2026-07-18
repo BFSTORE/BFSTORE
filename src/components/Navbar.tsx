@@ -73,7 +73,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                 >
                   {session.role === "ADMIN" && (
                     <Link
-                      href="/admin"
+                      href="/bfpanel"
                       role="menuitem"
                       onClick={() => setUserOpen(false)}
                       className="flex items-center gap-2.5 px-4 py-3 text-sm text-ink transition hover:bg-surface-2"
